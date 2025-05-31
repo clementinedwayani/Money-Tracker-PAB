@@ -61,7 +61,7 @@ fun Chart(name: String, modifier: Modifier = Modifier) {
                 Text(
                     text = "Expense Recap",
                     color = Color(0xFFFFFFFF),
-                    fontSize = 30.sp,
+                    fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.align(Alignment.Center)
                 )
