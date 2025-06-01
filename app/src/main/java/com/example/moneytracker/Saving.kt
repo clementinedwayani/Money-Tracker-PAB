@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -233,4 +234,16 @@ fun SavingBox() {
             }
         }
     }
+}
+
+@Preview(showBackground = true, heightDp = 800, widthDp = 400)
+@Composable
+fun SavingPreview() {
+    Saving(name = "Sample")
+}
+
+@Preview(showBackground = true, heightDp = 100, widthDp = 400)
+@Composable
+fun SavingBoxPreview() {
+    SavingBox()
 }
