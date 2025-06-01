@@ -2,6 +2,7 @@ package com.example.moneytracker
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,9 +34,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun Chart(name: String, modifier: Modifier = Modifier) {
+fun Chart(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -57,6 +59,7 @@ fun Chart(name: String, modifier: Modifier = Modifier) {
                         .size(36.dp)
                         .align(Alignment.CenterStart)
                         .padding(start = 16.dp)
+                        .clickable { navController.popBackStack() }
                 )
                 Text(
                     text = "Expense Recap",
@@ -71,7 +74,7 @@ fun Chart(name: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
         ) {
-            ButtonNav()
+            ButtonNav(navController)
         }
         Column(
             modifier = Modifier
@@ -383,29 +386,29 @@ fun ChartDetails3() {
         }
     }
 }
-@Preview(showBackground = true, heightDp = 800, widthDp = 400)
-@Composable
-fun ChartPreview() {
-    Chart(name = "Sample")
-}
-
-@Preview(showBackground = true, heightDp = 400, widthDp = 400)
-@Composable
-fun ChartPagePreview() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0XFFFBFAF5))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        ChartPage()
-    }
-}
-
-@Preview(showBackground = true, heightDp = 100, widthDp = 400)
-@Composable
-fun ButtonNavPreview() {
-    ButtonNav()
-}
+//@Preview(showBackground = true, heightDp = 800, widthDp = 400)
+//@Composable
+//fun ChartPreview() {
+//    Chart(navController)
+//}
+//
+//@Preview(showBackground = true, heightDp = 400, widthDp = 400)
+//@Composable
+//fun ChartPagePreview() {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color(0XFFFBFAF5))
+//            .padding(16.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
+//    ) {
+//        ChartPage()
+//    }
+//}
+//
+//@Preview(showBackground = true, heightDp = 100, widthDp = 400)
+//@Composable
+//fun ButtonNavPreview() {
+//    ButtonNav()
+//}
