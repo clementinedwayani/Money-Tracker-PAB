@@ -2,6 +2,7 @@ package com.example.moneytracker
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,9 +27,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun Saving(name: String, modifier: Modifier = Modifier) {
+fun Saving(navController: NavController) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -50,6 +52,7 @@ fun Saving(name: String, modifier: Modifier = Modifier) {
                         .size(36.dp)
                         .align(Alignment.CenterStart)
                         .padding(start = 16.dp)
+                        .clickable { navController.popBackStack() }
                 )
                 Text(
                     text = "Savings",
@@ -64,7 +67,7 @@ fun Saving(name: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
         ) {
-            ButtonNav()
+            ButtonNav(navController)
         }
         Column(
             modifier = Modifier
@@ -236,14 +239,14 @@ fun SavingBox() {
     }
 }
 
-@Preview(showBackground = true, heightDp = 800, widthDp = 400)
-@Composable
-fun SavingPreview() {
-    Saving(name = "Sample")
-}
-
-@Preview(showBackground = true, heightDp = 100, widthDp = 400)
-@Composable
-fun SavingBoxPreview() {
-    SavingBox()
-}
+//@Preview(showBackground = true, heightDp = 800, widthDp = 400)
+//@Composable
+//fun SavingPreview() {
+//    Saving(name = "Sample")
+//}
+//
+//@Preview(showBackground = true, heightDp = 100, widthDp = 400)
+//@Composable
+//fun SavingBoxPreview() {
+//    SavingBox()
+//}

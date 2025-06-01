@@ -1,25 +1,15 @@
 package com.example.moneytracker
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,34 +17,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class Home : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            Text(text = "Welcome tho Home Screen")
-        }
-    }
-}
-
 @Composable
-fun Home(name: String, modifier: Modifier = Modifier) {
+fun Home(navController: NavController, name: String, modifier: Modifier = Modifier) {
     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0XFFFBFAF5)),
+                .background(Color(0xFFFBFAF5)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -67,7 +47,7 @@ fun Home(name: String, modifier: Modifier = Modifier) {
             ) {
                 Text(
                     text = "Money Tracker",
-                    color = Color(0xFFFFFFFF),
+                    color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -81,23 +61,21 @@ fun Home(name: String, modifier: Modifier = Modifier) {
             ) {
                 Text(
                     text = currentDate,
-                    modifier = Modifier
-                        .padding(top = 5.dp, start = 16.dp),
+                    modifier = Modifier.padding(top = 5.dp, start = 16.dp),
                     fontSize = 18.sp,
                     color = Color.Black
                 )
                 Image(
                     painter = painterResource(id = R.drawable.calendar),
                     contentDescription = "Calendar Icon",
-                    modifier = Modifier
-                        .size(24.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
             Box(
                 modifier = Modifier
                     .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
                     .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0XFFF5FFF6))
+                    .background(Color(0xFFF5FFF6))
                     .width(350.dp)
                     .height(70.dp)
             ) {
@@ -109,29 +87,16 @@ fun Home(name: String, modifier: Modifier = Modifier) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text (
-                            text = "Rp 455.000"
-                        )
-                        Text (
-                            text = "Total"
-                        )
+                        Text(text = "Rp 455.000")
+                        Text(text = "Total")
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text (
-                            text = "Rp 500.000"
-                        )
-                        Text (
-                            text = "Income"
-                        )
+                        Text(text = "Rp 500.000")
+                        Text(text = "Income")
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text (
-                            text = "Rp 45.000",
-                            color = Color.Red
-                        )
-                        Text (
-                            text = "Expenses"
-                        )
+                        Text(text = "Rp 45.000", color = Color.Red)
+                        Text(text = "Expenses")
                     }
                 }
             }
@@ -146,42 +111,34 @@ fun Home(name: String, modifier: Modifier = Modifier) {
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0XFF9CE5B2))
+                        .background(Color(0xFF9CE5B2))
                         .width(90.dp)
                         .height(30.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Weekly"
-                    )
+                    Text(text = "Weekly")
                 }
                 Box(
                     modifier = Modifier
                         .padding(start = 5.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0XFF639F86))
+                        .background(Color(0xFF639F86))
                         .width(90.dp)
                         .height(30.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        color = Color.White
-                        ,
-                        text = "Monthly"
-                    )
+                    Text(color = Color.White, text = "Monthly")
                 }
                 Box(
                     modifier = Modifier
                         .padding(start = 5.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0XFF9CE5B2))
+                        .background(Color(0xFF9CE5B2))
                         .width(90.dp)
                         .height(30.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Yearly"
-                    )
+                    Text(text = "Yearly")
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -201,8 +158,7 @@ fun Home(name: String, modifier: Modifier = Modifier) {
                         .padding(horizontal = 16.dp)
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -256,8 +212,7 @@ fun Home(name: String, modifier: Modifier = Modifier) {
                             .padding(horizontal = 16.dp)
                     ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -309,8 +264,7 @@ fun Home(name: String, modifier: Modifier = Modifier) {
                             .offset(y = (-10).dp)
                     ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxSize(),
+                            modifier = Modifier.fillMaxSize(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -338,20 +292,35 @@ fun Home(name: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
         ) {
-            ButtonNav()
+            ButtonNav(navController)
         }
         Box(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 24.dp, bottom = 100.dp)
         ) {
-            AddTransaction()
+            IconButton(
+                onClick = { navController.navigate("activity") },
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Color(0xFF79B99C))
+                    .size(56.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "Add Transaction",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.Center),
+                    tint = Color.White
+                )
+            }
         }
     }
 }
 
 @Composable
-fun ButtonNav() {
+fun ButtonNav(navController: NavController) {
     val items = listOf("Home", "Charts", "Saving", "Payment")
     val icons = listOf(
         R.drawable.home,
@@ -370,7 +339,28 @@ fun ButtonNav() {
         items.forEachIndexed { index, label ->
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .clickable {
+                        when (label) {
+                            "Home" -> navController.navigate("home") {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                            "Charts" -> navController.navigate("charts") {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                            "Saving" -> navController.navigate("saving") {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                            "Payment" -> navController.navigate("payment") {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        }
+                    }
             ) {
                 Box(
                     modifier = Modifier
@@ -394,37 +384,4 @@ fun ButtonNav() {
             }
         }
     }
-}
-
-@Composable
-fun AddTransaction() {
-    Column(
-        horizontalAlignment = Alignment.End
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(Color(0xFF79B99C))
-                .size(56.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.add),
-                contentDescription = "Add icon",
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, heightDp = 800, widthDp = 400)
-@Composable
-fun HomePreview() {
-    Home(name = "Sample")
-}
-
-@Preview(showBackground = true, heightDp = 56, widthDp = 56)
-@Composable
-fun AddTransactionPreview() {
-    AddTransaction()
 }

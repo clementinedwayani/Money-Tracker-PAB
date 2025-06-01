@@ -3,6 +3,7 @@ package com.example.moneytracker
 import android.text.Layout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,9 +37,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 
 @Composable
-fun Payment(name: String, modifier: Modifier = Modifier) {
+fun Payment(navController: NavController) {
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -60,6 +63,7 @@ fun Payment(name: String, modifier: Modifier = Modifier) {
                         .size(36.dp)
                         .align(Alignment.CenterStart)
                         .padding(start = 16.dp)
+                        .clickable { navController.popBackStack() }
                 )
                 Text(
                     text = "Scheduled Payments",
@@ -74,7 +78,7 @@ fun Payment(name: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
         ) {
-            ButtonNav()
+            ButtonNav(navController)
         }
 
         Box(
@@ -84,7 +88,7 @@ fun Payment(name: String, modifier: Modifier = Modifier) {
                 .size(50.dp)
                 .background(Color(0xFF639F86), shape = CircleShape),
         ) {
-            IconButton(onClick = { }) {
+            IconButton(onClick = { navController.navigate("input_payment") } ) {
                 Icon(
                     Icons.Rounded.Add,
                     contentDescription = "",
@@ -228,15 +232,15 @@ fun PaymentPage() {
         }
     }
 }
-
-@Preview(showBackground = true, heightDp = 800, widthDp = 400)
-@Composable
-fun PaymentPreview() {
-    Payment(name = "Sample")
-}
-
-@Preview(showBackground = true, heightDp = 400, widthDp = 400)
-@Composable
-fun PaymentPagePreview() {
-    PaymentPage()
-}
+//
+//@Preview(showBackground = true, heightDp = 800, widthDp = 400)
+//@Composable
+//fun PaymentPreview() {
+//    Payment(name = "Sample")
+//}
+//
+//@Preview(showBackground = true, heightDp = 400, widthDp = 400)
+//@Composable
+//fun PaymentPagePreview() {
+//    PaymentPage()
+//}

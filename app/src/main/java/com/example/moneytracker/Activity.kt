@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import net.objecthunter.exp4j.ExpressionBuilder
 import java.text.SimpleDateFormat
 import java.util.*
@@ -39,7 +40,7 @@ data class Transaction(
 )
 
 @Composable
-fun Activity(name: String, modifier: Modifier = Modifier) {
+fun Activity(navController: NavController) {
     var selectedTab by remember { mutableStateOf(0) }
     var calculatorInput by remember { mutableStateOf("") }
     var categoryEmoji by remember { mutableStateOf("") }
@@ -308,8 +309,8 @@ fun Activity(name: String, modifier: Modifier = Modifier) {
                         .size(36.dp)
                         .align(Alignment.CenterStart)
                         .padding(start = 16.dp)
-                        .clickable { /* Handle back navigation */ },
-                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
+                        .clickable { navController.popBackStack() },
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Black)
                 )
                 Text(
                     text = "Add Activity",
