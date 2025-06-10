@@ -1,6 +1,5 @@
 package com.example.moneytracker
 
-import android.text.Layout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,12 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -31,22 +29,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @Composable
 fun Payment(navController: NavController) {
-
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0XFFFBFAF5)),
+                .background(Color(0xFFFBFAF5)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -78,8 +77,9 @@ fun Payment(navController: NavController) {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .fillMaxWidth()
         ) {
-            ButtonNav(navController)
+            ButtonNav(navController = navController)
         }
 
         Box(
@@ -89,10 +89,10 @@ fun Payment(navController: NavController) {
                 .size(50.dp)
                 .background(Color(0xFF639F86), shape = CircleShape),
         ) {
-            IconButton(onClick = { navController.navigate("input_payment") } ) {
+            IconButton(onClick = { navController.navigate("input_payment") }) {
                 Icon(
                     Icons.Rounded.Add,
-                    contentDescription = "",
+                    contentDescription = "Add payment",
                     modifier = Modifier
                         .size(40.dp)
                         .align(Alignment.Center)
@@ -113,135 +113,83 @@ fun Payment(navController: NavController) {
 
 @Composable
 fun PaymentPage() {
-    LazyColumn (
+    LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            Text(
-                text = "May 21 2025, Wednesday",
-                fontSize = 15.sp,
-                modifier = Modifier.padding(top = 20.dp, bottom = 5.dp)
-            )
-        }
+        items(DataManager.paymentDataList) { payment ->
+            val dateParts = payment.date.split("/")
+            val month = dateParts[0].toInt()
+            val day = dateParts[1].toInt()
+            val year = dateParts[2].toInt()
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month - 1, day)
 
-        item {
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0XFFF5FFF6))
-                    .width(330.dp)
-                    .height(90.dp),
-            ) {
-                Row (
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
+            val monthName = SimpleDateFormat("MMMM", Locale.US).format(calendar.time)
+            val dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.US)
+            val formattedDate = "$monthName $day $year, $dayOfWeek"
+
+            this@LazyColumn.item {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        Image(
-                            painter = painterResource(R.drawable.bank),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(70.dp)
-                        )
-                        Spacer(modifier = Modifier.size(5.dp))
-                        Column {
+                    Text(
+                        text = formattedDate,
+                        fontSize = 15.sp,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 5.dp),
+                        textAlign = TextAlign.Center
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFFF5FFF6))
+                            .width(330.dp)
+                            .height(90.dp),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                // Icon dicenter secara vertikal
+                                Box(
+                                    modifier = Modifier
+                                        .size(70.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = payment.icon,
+                                        fontSize = 40.sp,
+                                    )
+                                }
+                                Spacer(modifier = Modifier.size(5.dp))
+                                Column {
+                                    Text(
+                                        text = payment.title,
+                                        fontSize = 17.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Text(
+                                        text = payment.reminder,
+                                        fontSize = 12.sp,
+                                    )
+                                }
+                            }
                             Text(
-                                text = "Bank",
+                                text = "Rp ${payment.totalPayment}",
                                 fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = "One Time",
-                                fontSize = 12.sp,
+                                color = Color.Red,
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
-                    Text(
-                        text = "Rp 10.000.000,00",
-                        fontSize = 17.sp,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold
-                    )
-
                 }
             }
-
-        }
-
-        item {
-            Text(
-                text = "June 1 2025, Wednesday",
-                fontSize = 15.sp,
-                modifier = Modifier.padding(top = 30.dp, bottom = 5.dp)
-            )
-        }
-
-        item {
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0XFFF5FFF6))
-                    .width(330.dp)
-                    .height(90.dp),
-            ) {
-                Row (
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row (
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ){
-                        Image(
-                            painter = painterResource(R.drawable.tuition),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(70.dp)
-                        )
-                        Spacer(modifier = Modifier.size(5.dp))
-                        Column {
-                            Text(
-                                text = "Tuition Fee",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = "Every Month",
-                                fontSize = 12.sp,
-                            )
-                        }
-                    }
-                    Text(
-                        text = "Rp 750.000,00",
-                        fontSize = 17.sp,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                }
-            }
-
         }
     }
 }
-//
-//@Preview(showBackground = true, heightDp = 800, widthDp = 400)
-//@Composable
-//fun PaymentPreview() {
-//    Payment(name = "Sample")
-//}
-//
-//@Preview(showBackground = true, heightDp = 400, widthDp = 400)
-//@Composable
-//fun PaymentPagePreview() {
-//    PaymentPage()
-//}
