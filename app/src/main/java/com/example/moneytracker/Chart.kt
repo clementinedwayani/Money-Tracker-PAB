@@ -377,7 +377,6 @@ fun ChartDetails3() {
                 )
             }
 
-
             Text(
                 text = "Rp 35.000,00",
                 fontSize = 20.sp,

@@ -1,9 +1,12 @@
 package com.example.moneytracker
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,22 +24,32 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun Home(navController: NavController, name: String, modifier: Modifier = Modifier) {
+fun Home(navController: NavController, name: String, modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
+    val transactions = viewModel.transactions ?: emptyList() // Fallback to empty list if null
+    Log.d("Home", "Transactions in Home: ${transactions.size}")
+    Log.d("HomeVM", "Hash: ${viewModel.hashCode()}, Size: ${viewModel.transactions.size}")
+
     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
+
+    val totalIncome = transactions.filter { it.type == "Income" }.sumOf { it.amount }
+    val totalExpenses = transactions.filter { it.type == "Expense" }.sumOf { it.amount }
+    val totalBalance = totalIncome - totalExpenses
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .background(Color(0xFFFBFAF5)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -52,6 +65,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                     fontWeight = FontWeight.Bold
                 )
             }
+            // Date and Calendar
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -61,7 +75,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
             ) {
                 Text(
                     text = currentDate,
-                    modifier = Modifier.padding(top = 5.dp, start = 16.dp),
+                    modifier = Modifier.padding(start = 16.dp),
                     fontSize = 18.sp,
                     color = Color.Black
                 )
@@ -71,6 +85,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                     modifier = Modifier.size(24.dp)
                 )
             }
+            // Summary Box
             Box(
                 modifier = Modifier
                     .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
@@ -87,19 +102,20 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Rp 455.000")
+                        Text(text = "Rp ${totalBalance.toInt()}", fontWeight = FontWeight.Bold)
                         Text(text = "Total")
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Rp 500.000")
+                        Text(text = "Rp ${totalIncome.toInt()}", fontWeight = FontWeight.Bold, color = Color.Green)
                         Text(text = "Income")
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Rp 45.000", color = Color.Red)
+                        Text(text = "Rp ${totalExpenses.toInt()}", fontWeight = FontWeight.Bold, color = Color.Red)
                         Text(text = "Expenses")
                     }
                 }
             }
+            // Time Period Tabs
             Spacer(modifier = Modifier.height(20.dp))
             Row(
                 modifier = Modifier
@@ -107,183 +123,49 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF9CE5B2))
-                        .width(90.dp)
-                        .height(30.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Weekly")
-                }
-                Box(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF639F86))
-                        .width(90.dp)
-                        .height(30.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(color = Color.White, text = "Monthly")
-                }
-                Box(
-                    modifier = Modifier
-                        .padding(start = 5.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF9CE5B2))
-                        .width(90.dp)
-                        .height(30.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Yearly")
+                listOf("Weekly", "Monthly", "Yearly").forEach { period ->
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (period == "Monthly") Color(0xFF639F86) else Color(0xFF9CE5B2))
+                            .width(90.dp)
+                            .height(30.dp)
+                            .clickable { /* Handle period change */ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = period,
+                            color = if (period == "Monthly") Color.White else Color.Black
+                        )
+                    }
                 }
             }
+            // Transaction List
             Spacer(modifier = Modifier.height(10.dp))
-            Box(
+            val groupedTransactions = transactions.groupBy {
+                SimpleDateFormat("EEE, dd/MM", Locale.getDefault()).format(it.date.time)
+            }
+
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 30.dp, vertical = 20.dp)
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFFF5FFF6))
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = R.drawable.food),
-                                contentDescription = "Food icon",
-                                modifier = Modifier.size(40.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(text = "Food", fontSize = 18.sp)
-                        }
+                groupedTransactions.forEach { (date, dailyTransactions) ->
+                    item {
+                        // Tampilkan tanggal sekali
                         Text(
-                            text = "-Rp 15.000",
-                            color = Color.Red,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            text = date,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
-                }
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .offset(y = (-10).dp)
-                        .clip(RoundedCornerShape(bottomEnd = 10.dp))
-                        .background(Color(0xFF9CE5B2))
-                        .padding(horizontal = 16.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = "Wed, 21/05",
-                        color = Color.Black,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .shadow(elevation = 5.dp)
-                            .clip(RoundedCornerShape(topEnd = 10.dp))
-                            .background(Color(0xFFF5FFF6))
-                            .fillMaxWidth()
-                            .height(100.dp)
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.food),
-                                    contentDescription = "Food icon",
-                                    modifier = Modifier.size(40.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = "Food", fontSize = 18.sp)
-                            }
-                            Text(
-                                text = "-Rp 15.000",
-                                color = Color.Red,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .offset(y = (-10).dp)
-                            .clip(RoundedCornerShape(bottomEnd = 10.dp))
-                            .background(Color(0xFF9CE5B2))
-                            .padding(horizontal = 16.dp, vertical = 6.dp)
-                    ) {
-                        Text(
-                            text = "Sat, 17/05",
-                            color = Color.Black,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .shadow(elevation = 5.dp)
-                            .clip(RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))
-                            .background(Color(0xFFF5FFF6))
-                            .height(80.dp)
-                            .padding(horizontal = 16.dp)
-                            .offset(y = (-10).dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.transport_bus),
-                                    contentDescription = "Transport Bus icon",
-                                    modifier = Modifier.size(40.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = "Transport", fontSize = 18.sp)
-                            }
-                            Text(
-                                text = "-Rp 15.000",
-                                color = Color.Red,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
+
+                    items(dailyTransactions) { transaction ->
+                        TransactionItem(transaction)
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
@@ -309,12 +191,46 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                 Icon(
                     imageVector = Icons.Rounded.Add,
                     contentDescription = "Add Transaction",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center),
+                    modifier = Modifier.size(40.dp),
                     tint = Color.White
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun TransactionItem(transaction: Transaction) {
+    val splitCategory = transaction.category.split(" ", limit = 2)
+    val emoji = splitCategory.getOrNull(0) ?: "❓"
+    val categoryName = splitCategory.getOrNull(1) ?: transaction.category
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color(0xFFF5FFF6))
+            .height(80.dp)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = emoji, fontSize = 24.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = categoryName, fontSize = 18.sp)
+            }
+            Text(
+                text = if (transaction.type == "Income") "+Rp ${transaction.amount.toInt()}" else "-Rp ${transaction.amount.toInt()}",
+                color = if (transaction.type == "Income") Color.Green else Color.Red,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -381,6 +297,67 @@ fun ButtonNav(navController: NavController) {
                     color = Color.Black,
                     fontSize = 14.sp
                 )
+            }
+        }
+    }
+
+    @Composable
+    fun TransactionItem(transaction: Transaction) {
+        val dateFormat = SimpleDateFormat("EEE, dd/MM", Locale.getDefault())
+        val transactionDate = dateFormat.format(transaction.date.time)
+        val splitCategory = transaction.category.split(" ", limit = 2)
+        val emoji = splitCategory.getOrNull(0) ?: "❓"
+        val categoryName = splitCategory.getOrNull(1) ?: transaction.category
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(y = (-10).dp)
+                    .clip(RoundedCornerShape(bottomEnd = 10.dp))
+                    .background(Color(0xFF9CE5B2))
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = transactionDate,
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFF5FFF6))
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = emoji,
+                            fontSize = 24.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = categoryName, fontSize = 18.sp)
+                    }
+                    Text(
+                        text = if (transaction.type == "Income") "+Rp ${transaction.amount.toInt()}" else "-Rp ${transaction.amount.toInt()}",
+                        color = if (transaction.type == "Income") Color.Green else Color.Red,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

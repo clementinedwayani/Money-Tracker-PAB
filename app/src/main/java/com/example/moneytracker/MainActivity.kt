@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -21,6 +22,8 @@ class MainActivity : ComponentActivity() {
             MoneyTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController = rememberNavController()
+                    val mainViewModel: MainViewModel = viewModel() // Buat instance ViewModel di sini
+
                     NavHost(
                         navController = navController,
                         startDestination = "home",
@@ -29,14 +32,19 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             Home(
                                 navController = navController,
-                                name = "Android",
-                                modifier = Modifier
+                                name = "User", // Hapus parameter "Android" yang duplikat
+                                viewModel = mainViewModel // Pass ViewModel instance
                             )
                         }
                         composable("charts") { Chart(navController = navController) }
                         composable("saving") { Saving(navController = navController) }
                         composable("payment") { Payment(navController = navController) }
-                        composable("activity") { Activity(navController = navController) }
+                        composable("activity") {
+                            Activity(
+                                navController = navController,
+                                viewModel = mainViewModel // Pass ViewModel yang sama
+                            )
+                        }
                         composable("input_payment") { InputPayment(navController = navController) }
                     }
                 }

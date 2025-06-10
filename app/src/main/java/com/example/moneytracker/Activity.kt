@@ -1,6 +1,7 @@
 package com.example.moneytracker
 
 import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -25,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import net.objecthunter.exp4j.ExpressionBuilder
 import java.text.SimpleDateFormat
@@ -40,7 +42,7 @@ data class Transaction(
 )
 
 @Composable
-fun Activity(navController: NavController) {
+fun Activity(navController: NavController, viewModel: MainViewModel = viewModel()) {
     var selectedTab by remember { mutableStateOf(0) }
     var calculatorInput by remember { mutableStateOf("") }
     var categoryEmoji by remember { mutableStateOf("") }
@@ -172,7 +174,7 @@ fun Activity(navController: NavController) {
         dialog.show()
     }
 
-    // Function to save transaction
+    // Ubah fungsi saveTransaction untuk menambahkan navigasi
     fun saveTransaction() {
         if (calculatorInput.isEmpty()) {
             Toast.makeText(context, "Please enter an amount", Toast.LENGTH_LONG).show()
@@ -209,21 +211,30 @@ fun Activity(navController: NavController) {
                 date = selectedDate.clone() as Calendar
             )
 
-            transactions = transactions + newTransaction
+            // Tambahkan ke ViewModel
+            viewModel.addTransaction(newTransaction)
+            Log.d("Activity", "Transaction added: ${newTransaction.category}, ${newTransaction.amount}")
+            Log.d("Activity", "Total transactions: ${viewModel.transactions.size}")
+            Log.d("ActivityVM", "Hash: ${viewModel.hashCode()}, Size: ${viewModel.transactions.size}")
 
+            // Reset form
             calculatorInput = ""
             updateSelectedCategory("")
             categoryEmoji = ""
             categoryText = ""
 
-            Toast.makeText(context, "Transaction saved!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Transaction saved!", Toast.LENGTH_SHORT).show()
+
+            // Navigasi ke home setelah menyimpan
+            navController.navigate("home") {
+                popUpTo("home") { inclusive = true }
+            }
 
         } catch (e: Exception) {
             Toast.makeText(context, "Error saving transaction: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    // Function to save transaction with goal
     fun saveTransactionWithGoal() {
         try {
             val amount = calculatorInput.toDoubleOrNull()
@@ -242,8 +253,10 @@ fun Activity(navController: NavController) {
                 goalAmount = goal
             )
 
-            transactions = transactions + newTransaction
+            // Tambahkan ke ViewModel
+            viewModel.addTransaction(newTransaction)
 
+            // Reset form
             calculatorInput = ""
             updateSelectedCategory("")
             categoryEmoji = ""
@@ -251,7 +264,12 @@ fun Activity(navController: NavController) {
             goalAmount = ""
             showGoalDialog = false
 
-            Toast.makeText(context, "Saving goal created!", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Saving goal created!", Toast.LENGTH_SHORT).show()
+
+            // Navigasi ke home setelah menyimpan
+            navController.navigate("home") {
+                popUpTo("home") { inclusive = true }
+            }
 
         } catch (e: Exception) {
             Toast.makeText(context, "Error saving goal: ${e.message}", Toast.LENGTH_LONG).show()
