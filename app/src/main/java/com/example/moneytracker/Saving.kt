@@ -27,10 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 @Composable
-fun Saving(navController: NavController) {
+fun Saving(navController: NavController, viewModel: MainViewModel = viewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -76,166 +77,59 @@ fun Saving(navController: NavController) {
                 .padding(top = 130.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            SavingBox()
+            SavingBox(viewModel)
         }
     }
 }
 
 @Composable
-fun SavingBox() {
-    Box(
-        modifier = Modifier
-            .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0XFFF5FFF6))
-            .width(350.dp)
-            .height(100.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "House",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.house),
-                    contentDescription = "Food icon",
-                    modifier = Modifier.size(50.dp)
-                )
-            }
-            Row(
+fun SavingBox(viewModel: MainViewModel) {
+    val summaries = viewModel.getSavingSummary()
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        summaries.forEach { summary ->
+            val split = summary.category.split(" ", limit = 2)
+            val emoji = split.getOrNull(0) ?: "💰"
+            val name = split.getOrNull(1) ?: summary.category
+
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0XFFF5FFF6))
+                    .width(350.dp)
+                    .height(100.dp)
+                    .padding(16.dp)
             ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(1f)
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "Total", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "Rp 300.000")
-                }
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Goal", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "Rp 10.000.000")
-                    Text(text = "-Rp 9.700.000", color = Color. Red, fontWeight = FontWeight.Bold)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = name, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text(text = emoji, fontSize = 32.sp)
+                    }
+                    Column(horizontalAlignment = Alignment.Start) {
+                        Text(text = "Total", color = Color.Gray, fontSize = 12.sp)
+                        Text(text = "Rp ${summary.total.toInt()}")
+                    }
+                    Column(horizontalAlignment = Alignment.Start) {
+                        Text(text = "Goal", color = Color.Gray, fontSize = 12.sp)
+                        Text(text = "Rp ${summary.goal.toInt()}")
+                        Text(
+                            text = "Sisa: Rp ${summary.remaining.toInt()}",
+                            color = if (summary.remaining > 0) Color.Red else Color.Green,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
         }
-    }
-    Spacer(modifier = Modifier.height(20.dp))
-    Box(
-        modifier = Modifier
-            .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0XFFF5FFF6))
-            .width(350.dp)
-            .height(100.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "House",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.house),
-                    contentDescription = "Food icon",
-                    modifier = Modifier.size(50.dp)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Total", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "Rp 300.000")
-                }
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Goal", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "Rp 10.000.000")
-                    Text(text = "-Rp 9.700.000", color = Color. Red, fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-    }
-    Spacer(modifier = Modifier.height(20.dp))
-    Box(
-        modifier = Modifier
-            .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color(0XFFF5FFF6))
-            .width(350.dp)
-            .height(100.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "House",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.house),
-                    contentDescription = "Food icon",
-                    modifier = Modifier.size(50.dp)
-                )
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Total", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "Rp 300.000")
-                }
-                Column(
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = "Goal", color = Color.Gray, fontSize = 12.sp)
-                    Text(text = "Rp 10.000.000")
-                    Text(text = "-Rp 9.700.000", color = Color. Red, fontWeight = FontWeight.Bold)
-                }
-            }
+
+        if (summaries.isEmpty()) {
+            Text("Belum ada data tabungan.", color = Color.Gray)
         }
     }
 }

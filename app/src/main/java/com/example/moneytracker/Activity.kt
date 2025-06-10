@@ -266,9 +266,9 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
 
             Toast.makeText(context, "Saving goal created!", Toast.LENGTH_SHORT).show()
 
-            // Navigasi ke home setelah menyimpan
-            navController.navigate("home") {
-                popUpTo("home") { inclusive = true }
+            // Navigasi ke saving setelah menyimpan
+            navController.navigate("saving") {
+                popUpTo("saving") { inclusive = true }
             }
 
         } catch (e: Exception) {

@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("charts") { Chart(navController = navController) }
-                        composable("saving") { Saving(navController = navController) }
+                        composable("saving") { Saving(navController = navController, viewModel = mainViewModel) }
                         composable("payment") { Payment(navController = navController) }
                         composable("activity") {
                             Activity(
