@@ -328,7 +328,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                         .align(Alignment.CenterStart)
                         .padding(start = 16.dp)
                         .clickable { navController.popBackStack() },
-                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.Black)
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )
                 Text(
                     text = "Add Activity",

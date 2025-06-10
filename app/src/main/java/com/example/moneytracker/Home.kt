@@ -29,12 +29,67 @@ import androidx.navigation.NavController
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.runtime.*
+import java.util.Calendar
 
 @Composable
 fun Home(navController: NavController, name: String, modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
     val transactions = viewModel.transactions ?: emptyList() // Fallback to empty list if null
     Log.d("Home", "Transactions in Home: ${transactions.size}")
     Log.d("HomeVM", "Hash: ${viewModel.hashCode()}, Size: ${viewModel.transactions.size}")
+
+    var selectedPeriod by remember { mutableStateOf("Monthly") }
+
+    Log.d("DEBUG", "All transactions: ${transactions.map { it.date }}")
+
+    fun filterTransactionsByPeriod(period: String, allTransactions: List<Transaction>): List<Transaction> {
+        val calendar = Calendar.getInstance()
+        val now = calendar.time
+
+        return when (period) {
+            "Weekly" -> {
+                calendar.time = now
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                calendar.add(Calendar.DAY_OF_YEAR, -7)
+                val startOfWeek = calendar.time
+
+                allTransactions.filter { it.date >= startOfWeek && it.date < now }
+            }
+            "Monthly" -> {
+                calendar.time = now
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfMonth = calendar.time
+
+                calendar.add(Calendar.MONTH, 1)
+                val startOfNextMonth = calendar.time
+
+                allTransactions.filter { it.date >= startOfMonth && it.date < startOfNextMonth }
+            }
+            "Yearly" -> {
+                calendar.time = now
+                calendar.set(Calendar.MONTH, 0)
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfYear = calendar.time
+
+                calendar.add(Calendar.YEAR, 1)
+                val startOfNextYear = calendar.time
+
+                allTransactions.filter { it.date >= startOfYear && it.date < startOfNextYear }
+            }
+            else -> allTransactions
+        }
+    }
 
     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
 
@@ -128,22 +183,24 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                         modifier = Modifier
                             .padding(start = 5.dp)
                             .clip(RoundedCornerShape(10.dp))
-                            .background(if (period == "Monthly") Color(0xFF639F86) else Color(0xFF9CE5B2))
+                            .background(if (period == selectedPeriod) Color(0xFF639F86) else Color(0xFF9CE5B2))
                             .width(90.dp)
                             .height(30.dp)
-                            .clickable { /* Handle period change */ },
+                            .clickable { selectedPeriod = period }, // ✅ Ubah periode di sini
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = period,
-                            color = if (period == "Monthly") Color.White else Color.Black
+                            color = if (period == selectedPeriod) Color.White else Color.Black
                         )
                     }
                 }
             }
             // Transaction List
             Spacer(modifier = Modifier.height(10.dp))
-            val groupedTransactions = transactions.groupBy {
+            val filteredTransactions = filterTransactionsByPeriod(selectedPeriod, transactions)
+
+            val groupedTransactions = filteredTransactions.groupBy {
                 SimpleDateFormat("EEE, dd/MM", Locale.getDefault()).format(it.date.time)
             }
 
@@ -197,6 +254,10 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
             }
         }
     }
+}
+
+private operator fun Calendar.compareTo(date: Date): Int {
+    return this.time.compareTo(date)
 }
 
 @Composable

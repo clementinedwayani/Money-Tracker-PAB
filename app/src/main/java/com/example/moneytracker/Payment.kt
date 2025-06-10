@@ -63,7 +63,8 @@ fun Payment(navController: NavController) {
                         .size(36.dp)
                         .align(Alignment.CenterStart)
                         .padding(start = 16.dp)
-                        .clickable { navController.popBackStack() }
+                        .clickable { navController.popBackStack() },
+                    colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White)
                 )
                 Text(
                     text = "Scheduled Payments",
