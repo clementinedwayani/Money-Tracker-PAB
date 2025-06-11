@@ -38,7 +38,7 @@ data class Transaction(
     val category: String,
     val amount: Double,
     val date: Calendar,
-    val goalAmount: Double? = null // For saving goals
+    val goalAmount: Double? = null // Untuk menyimpan goals pada halaman Saving
 )
 
 @Composable
@@ -174,7 +174,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
         dialog.show()
     }
 
-    // Ubah fungsi saveTransaction untuk menambahkan navigasi
+    //fungsi saveTransaction untuk menambahkan navigasi
     fun saveTransaction() {
         if (calculatorInput.isEmpty()) {
             Toast.makeText(context, "Please enter an amount", Toast.LENGTH_LONG).show()

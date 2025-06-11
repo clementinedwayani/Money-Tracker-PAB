@@ -22,8 +22,9 @@ class MainActivity : ComponentActivity() {
             MoneyTrackerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController = rememberNavController()
-                    val mainViewModel: MainViewModel = viewModel() // Buat instance ViewModel di sini
+                    val mainViewModel: MainViewModel = viewModel()
 
+                    // Button Navigation
                     NavHost(
                         navController = navController,
                         startDestination = "home",
@@ -32,17 +33,18 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             Home(
                                 navController = navController,
-                                name = "User", // Hapus parameter "Android" yang duplikat
-                                viewModel = mainViewModel // Pass ViewModel instance
+                                name = "User",
+                                viewModel = mainViewModel
                             )
                         }
                         composable("charts") { Chart(navController = navController) }
                         composable("saving") { Saving(navController = navController, viewModel = mainViewModel) }
                         composable("payment") { Payment(navController = navController) }
                         composable("activity") {
+                            // Activity ketika user menambahkan data pengeluaran dan pemasukan
                             Activity(
                                 navController = navController,
-                                viewModel = mainViewModel // Pass ViewModel yang sama
+                                viewModel = mainViewModel
                             )
                         }
                         composable("input_payment") { InputPayment(navController = navController) }

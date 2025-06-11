@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -127,7 +126,6 @@ fun SavingBox(viewModel: MainViewModel) {
             }
             Spacer(modifier = Modifier.height(16.dp))
         }
-
         if (summaries.isEmpty()) {
             Text("Belum ada data tabungan.", color = Color.Gray)
         }

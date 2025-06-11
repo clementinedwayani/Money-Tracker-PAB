@@ -34,18 +34,19 @@ import java.util.Calendar
 
 @Composable
 fun Home(navController: NavController, name: String, modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
-    val transactions = viewModel.transactions ?: emptyList() // Fallback to empty list if null
+    // Menyimpan transaksi pada halaman Home
+    val transactions = viewModel.transactions ?: emptyList()
     Log.d("Home", "Transactions in Home: ${transactions.size}")
     Log.d("HomeVM", "Hash: ${viewModel.hashCode()}, Size: ${viewModel.transactions.size}")
 
+    // Menyimpan transaksi per-weekly, monthly, dan yearly
     var selectedPeriod by remember { mutableStateOf("Monthly") }
-
     Log.d("DEBUG", "All transactions: ${transactions.map { it.date }}")
 
+    // fungsi filter transaksi sesuai periode (weekly, monthly, dan yearly)
     fun filterTransactionsByPeriod(period: String, allTransactions: List<Transaction>): List<Transaction> {
         val calendar = Calendar.getInstance()
         val now = calendar.time
-
         return when (period) {
             "Weekly" -> {
                 calendar.time = now
@@ -81,10 +82,8 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MILLISECOND, 0)
                 val startOfYear = calendar.time
-
                 calendar.add(Calendar.YEAR, 1)
                 val startOfNextYear = calendar.time
-
                 allTransactions.filter { it.date >= startOfYear && it.date < startOfNextYear }
             }
             else -> allTransactions
@@ -92,7 +91,6 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
     }
 
     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date())
-
     val totalIncome = transactions.filter { it.type == "Income" }.sumOf { it.amount }
     val totalExpenses = transactions.filter { it.type == "Expense" }.sumOf { it.amount }
     val totalBalance = totalIncome - totalExpenses
@@ -186,7 +184,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                             .background(if (period == selectedPeriod) Color(0xFF639F86) else Color(0xFF9CE5B2))
                             .width(90.dp)
                             .height(30.dp)
-                            .clickable { selectedPeriod = period }, // ✅ Ubah periode di sini
+                            .clickable { selectedPeriod = period },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -199,11 +197,9 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
             // Transaction List
             Spacer(modifier = Modifier.height(10.dp))
             val filteredTransactions = filterTransactionsByPeriod(selectedPeriod, transactions)
-
             val groupedTransactions = filteredTransactions.groupBy {
                 SimpleDateFormat("EEE, dd/MM", Locale.getDefault()).format(it.date.time)
             }
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -219,7 +215,6 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
-
                     items(dailyTransactions) { transaction ->
                         TransactionItem(transaction)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -358,67 +353,6 @@ fun ButtonNav(navController: NavController) {
                     color = Color.Black,
                     fontSize = 14.sp
                 )
-            }
-        }
-    }
-
-    @Composable
-    fun TransactionItem(transaction: Transaction) {
-        val dateFormat = SimpleDateFormat("EEE, dd/MM", Locale.getDefault())
-        val transactionDate = dateFormat.format(transaction.date.time)
-        val splitCategory = transaction.category.split(" ", limit = 2)
-        val emoji = splitCategory.getOrNull(0) ?: "❓"
-        val categoryName = splitCategory.getOrNull(1) ?: transaction.category
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset(y = (-10).dp)
-                    .clip(RoundedCornerShape(bottomEnd = 10.dp))
-                    .background(Color(0xFF9CE5B2))
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = transactionDate,
-                    color = Color.Black,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFF5FFF6))
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(horizontal = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = emoji,
-                            fontSize = 24.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = categoryName, fontSize = 18.sp)
-                    }
-                    Text(
-                        text = if (transaction.type == "Income") "+Rp ${transaction.amount.toInt()}" else "-Rp ${transaction.amount.toInt()}",
-                        color = if (transaction.type == "Income") Color.Green else Color.Red,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
             }
         }
     }
