@@ -28,16 +28,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import net.objecthunter.exp4j.ExpressionBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Entity(tableName = "transactions")
 data class Transaction(
+    @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     val type: String, // "Expense", "Income", "Saving"
     val category: String,
     val amount: Double,
-    val date: Calendar,
+    val date: Long,
     val goalAmount: Double? = null // Untuk menyimpan goals pada halaman Saving
 )
 
@@ -208,7 +212,8 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                 type = tabType,
                 category = getCurrentSelectedCategory(),
                 amount = amount,
-                date = selectedDate.clone() as Calendar
+                date = selectedDate.timeInMillis,
+//                goalAmount = null
             )
 
             // Tambahkan ke ViewModel
@@ -249,8 +254,8 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                 type = "Saving",
                 category = getCurrentSelectedCategory(),
                 amount = amount,
-                date = selectedDate.clone() as Calendar,
-                goalAmount = goal
+                date = selectedDate.timeInMillis,
+                goalAmount = null
             )
 
             // Tambahkan ke ViewModel

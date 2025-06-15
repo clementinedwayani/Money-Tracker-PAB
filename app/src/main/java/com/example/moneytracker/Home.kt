@@ -46,44 +46,44 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
     // fungsi filter transaksi sesuai periode (weekly, monthly, dan yearly)
     fun filterTransactionsByPeriod(period: String, allTransactions: List<Transaction>): List<Transaction> {
         val calendar = Calendar.getInstance()
-        val now = calendar.time
+        val nowTime = calendar.time.time
         return when (period) {
             "Weekly" -> {
-                calendar.time = now
+                calendar.time = Date(nowTime)
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MILLISECOND, 0)
                 calendar.add(Calendar.DAY_OF_YEAR, -7)
-                val startOfWeek = calendar.time
+                val startOfWeek = calendar.time.time
 
-                allTransactions.filter { it.date >= startOfWeek && it.date < now }
+                allTransactions.filter { it.date >= startOfWeek && it.date < nowTime }
             }
             "Monthly" -> {
-                calendar.time = now
+                calendar.time = Date(nowTime)
                 calendar.set(Calendar.DAY_OF_MONTH, 1)
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MILLISECOND, 0)
-                val startOfMonth = calendar.time
+                val startOfMonth = calendar.time.time
 
                 calendar.add(Calendar.MONTH, 1)
-                val startOfNextMonth = calendar.time
+                val startOfNextMonth = calendar.time.time
 
                 allTransactions.filter { it.date >= startOfMonth && it.date < startOfNextMonth }
             }
             "Yearly" -> {
-                calendar.time = now
+                calendar.time = Date(nowTime)
                 calendar.set(Calendar.MONTH, 0)
                 calendar.set(Calendar.DAY_OF_MONTH, 1)
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
                 calendar.set(Calendar.MINUTE, 0)
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MILLISECOND, 0)
-                val startOfYear = calendar.time
+                val startOfYear = calendar.time.time
                 calendar.add(Calendar.YEAR, 1)
-                val startOfNextYear = calendar.time
+                val startOfNextYear = calendar.time.time
                 allTransactions.filter { it.date >= startOfYear && it.date < startOfNextYear }
             }
             else -> allTransactions
@@ -198,7 +198,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
             Spacer(modifier = Modifier.height(10.dp))
             val filteredTransactions = filterTransactionsByPeriod(selectedPeriod, transactions)
             val groupedTransactions = filteredTransactions.groupBy {
-                SimpleDateFormat("EEE, dd/MM", Locale.getDefault()).format(it.date.time)
+                SimpleDateFormat("EEE, dd/MM", Locale.getDefault()).format(Date(it.date))
             }
             LazyColumn(
                 modifier = Modifier
@@ -353,6 +353,66 @@ fun ButtonNav(navController: NavController) {
                     color = Color.Black,
                     fontSize = 14.sp
                 )
+            }
+        }
+    }
+    @Composable
+    fun TransactionItem(transaction: Transaction) {
+        val dateFormat = SimpleDateFormat("EEE, dd/MM", Locale.getDefault())
+        val transactionDate = dateFormat.format(Date(transaction.date))
+        val splitCategory = transaction.category.split(" ", limit = 2)
+        val emoji = splitCategory.getOrNull(0) ?: "❓"
+        val categoryName = splitCategory.getOrNull(1) ?: transaction.category
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset(y = (-10).dp)
+                    .clip(RoundedCornerShape(bottomEnd = 10.dp))
+                    .background(Color(0xFF9CE5B2))
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = transactionDate,
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFF5FFF6))
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .padding(horizontal = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = emoji,
+                            fontSize = 24.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = categoryName, fontSize = 18.sp)
+                    }
+                    Text(
+                        text = if (transaction.type == "Income") "+Rp ${transaction.amount.toInt()}" else "-Rp ${transaction.amount.toInt()}",
+                        color = if (transaction.type == "Income") Color.Green else Color.Red,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

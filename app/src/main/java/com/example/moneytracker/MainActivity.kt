@@ -23,6 +23,8 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController = rememberNavController()
                     val mainViewModel: MainViewModel = viewModel()
+                    val db = AppDatabase.getDatabase(applicationContext)
+                    val transactionDao = db.transactionDao()
 
                     // Button Navigation
                     NavHost(
