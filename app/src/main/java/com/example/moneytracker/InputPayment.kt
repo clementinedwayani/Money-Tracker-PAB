@@ -6,10 +6,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
@@ -34,13 +34,13 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
 @Composable
-fun InputPayment(navController: NavController) {
+fun InputPayment(navController: NavController, viewModel: MainViewModel = viewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -79,7 +79,7 @@ fun InputPayment(navController: NavController) {
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                InputPaymentPage(navController)
+                InputPaymentPage(navController, viewModel)
             }
         }
         Box(
@@ -93,7 +93,7 @@ fun InputPayment(navController: NavController) {
 }
 
 @Composable
-fun InputPaymentPage(navController: NavController) {
+fun InputPaymentPage(navController: NavController, viewModel: MainViewModel) {
     val titleState = remember { mutableStateOf("") }
     val selectedEmoji = remember { mutableStateOf("💳") }
     val paymentState = remember { mutableStateOf("") }
@@ -104,8 +104,6 @@ fun InputPaymentPage(navController: NavController) {
     val reminderState = remember { mutableStateOf("Every Day") }
     var expanded by remember { mutableStateOf(false) }
     var isSelected by remember { mutableStateOf(false) }
-
-    val reminderOptions = listOf("Every Day", "Every Week", "Every Month", "Every Year", "One Time")
 
     LazyColumn(
         modifier = Modifier
@@ -130,15 +128,20 @@ fun InputPaymentPage(navController: NavController) {
                     .width(330.dp)
                     .height(50.dp)
                     .clickable {
-                        val newPayment = PaymentData(
-                            title = titleState.value,
-                            icon = selectedEmoji.value,
-                            totalPayment = paymentState.value,
-                            date = dateState.value,
-                            reminder = reminderState.value
-                        )
-                        DataManager.addPayment(newPayment)
-                        navController.popBackStack()
+                        if (titleState.value.isNotEmpty() && paymentState.value.isNotEmpty() && dateState.value.isNotEmpty()) {
+                            val newPayment = PaymentEntity(
+                                title = titleState.value,
+                                icon = selectedEmoji.value,
+                                totalPayment = paymentState.value,
+                                date = dateState.value,
+                                reminder = reminderState.value
+                            )
+                            viewModel.addPayment(newPayment)
+                            navController.navigate("payment") {
+                                popUpTo("input_payment") { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        }
                     },
                 contentAlignment = Alignment.Center
             ) {

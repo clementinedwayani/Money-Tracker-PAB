@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,11 +40,11 @@ import java.util.*
 data class Transaction(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val type: String, // "Expense", "Income", "Saving"
+    val type: String,
     val category: String,
     val amount: Double,
     val date: Long,
-    val goalAmount: Double? = null // Untuk menyimpan goals pada halaman Saving
+    val goalAmount: Double? = null
 )
 
 @Composable
@@ -75,8 +77,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
     val emojiList = listOf(
         "🍕", "🚗", "🛍️", "🎉", "💄", "📚", "🏥", "🧃",
         "🏠", "💰", "🎯", "✈️", "🍎", "⚡", "🎮", "🎵",
-        "🏋️", "🍔", "☕", "🚌", "🛒", "🎪", "💊", "📱",
-        "","","","","","","","","","","","","","","","",""
+        "🏋️", "🍔", "☕", "🚌", "🛒", "🎪", "💊", "📱"
     ).filter { it.isNotEmpty() }
 
     // Use mutableStateListOf so Compose tracks internal mutations properly
@@ -117,13 +118,12 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
 
     // Get current selected category based on tab
     val getCurrentSelectedCategory = {
-        val category = when (selectedTab) {
+        when (selectedTab) {
             0 -> selectedExpenseCategory
             1 -> selectedIncomeCategory
             2 -> selectedSavingCategory
             else -> ""
         }
-        category
     }
 
     // Update selected category for current tab
@@ -178,7 +178,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
         dialog.show()
     }
 
-    //fungsi saveTransaction untuk menambahkan navigasi
+    // Function to save transaction
     fun saveTransaction() {
         if (calculatorInput.isEmpty()) {
             Toast.makeText(context, "Please enter an amount", Toast.LENGTH_LONG).show()
@@ -213,10 +213,10 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                 category = getCurrentSelectedCategory(),
                 amount = amount,
                 date = selectedDate.timeInMillis,
-//                goalAmount = null
+                goalAmount = null
             )
 
-            // Tambahkan ke ViewModel
+            // Add to ViewModel
             viewModel.addTransaction(newTransaction)
             Log.d("Activity", "Transaction added: ${newTransaction.category}, ${newTransaction.amount}")
             Log.d("Activity", "Total transactions: ${viewModel.transactions.size}")
@@ -230,7 +230,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
 
             Toast.makeText(context, "Transaction saved!", Toast.LENGTH_SHORT).show()
 
-            // Navigasi ke home setelah menyimpan
+            // Navigate to home after saving
             navController.navigate("home") {
                 popUpTo("home") { inclusive = true }
             }
@@ -240,6 +240,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
         }
     }
 
+    // Function to save transaction with goal for Saving tab
     fun saveTransactionWithGoal() {
         try {
             val amount = calculatorInput.toDoubleOrNull()
@@ -255,10 +256,10 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                 category = getCurrentSelectedCategory(),
                 amount = amount,
                 date = selectedDate.timeInMillis,
-                goalAmount = null
+                goalAmount = goal // Include goalAmount in the Transaction
             )
 
-            // Tambahkan ke ViewModel
+            // Add to ViewModel
             viewModel.addTransaction(newTransaction)
 
             // Reset form
@@ -271,7 +272,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
 
             Toast.makeText(context, "Saving goal created!", Toast.LENGTH_SHORT).show()
 
-            // Navigasi ke saving setelah menyimpan
+            // Navigate to saving after saving
             navController.navigate("saving") {
                 popUpTo("saving") { inclusive = true }
             }
@@ -409,13 +410,13 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                 }
             }
 
-            // Category input section - improved
+            // Category input section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp, vertical = 16.dp)
             ) {
-                // Emoji Picker (positioned above input when visible)
+                // Emoji Picker
                 if (showEmojiPicker) {
                     Box(
                         modifier = Modifier
@@ -539,7 +540,8 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
                             onValueChange = { goalAmount = it },
                             label = { Text("Goal Amount (Optional)") },
                             placeholder = { Text("Enter target amount") },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number) // Restrict to numbers only
                         )
                     }
                 },
@@ -589,7 +591,7 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
             )
         }
 
-        // Enhanced Calculator Section (Bottom)
+        // Calculator Section
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -694,17 +696,17 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
     }
 }
 
-// Function to get different money icon per tab (decorative only)
+// Function to get different money icon per tab
 fun getMoneyIcon(selectedTab: Int): String {
     return when (selectedTab) {
-        0 -> "💸" // Expense - money with wings
-        1 -> "💰" // Income - money bag
-        2 -> "🏦" // Saving - bank
+        0 -> "💸"
+        1 -> "💰"
+        2 -> "🏦"
         else -> "💰"
     }
 }
 
-// Function to get tab icon different per tab
+// Function to get tab icon
 fun getTabIcon(selectedTab: Int): String {
     return when (selectedTab) {
         0 -> "💸" // Expense
@@ -714,7 +716,7 @@ fun getTabIcon(selectedTab: Int): String {
     }
 }
 
-// Enhanced calculator input handler with save function
+// Calculator input handler
 fun handleCalculatorInput(
     buttonText: String,
     currentInput: String,
@@ -747,7 +749,6 @@ fun handleCalculatorInput(
             showDatePicker()
         }
         "💸", "💰", "🏦" -> {
-            // Tab icons are decorative only, do nothing
         }
         else -> {
             if (currentInput != "Error") {
