@@ -3,9 +3,11 @@ package com.example.moneytracker
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import androidx.compose.ui.graphics.Color
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val dao: TransactionDao = AppDatabase.getDatabase(application).transactionDao()
@@ -13,6 +15,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val transactions = mutableStateListOf<Transaction>()
     val payments = mutableStateListOf<PaymentEntity>()
+
+    val categoryColors = mutableStateMapOf<String, Color>()
+
+    private val colors = listOf(
+        Color(0xFF3A86FF), Color(0xFFF94144), Color(0xFFFFBE0B), Color(0xFF8338EC), Color(0xFFFB5607),
+        Color(0xFF06D6A0), Color(0xFF118AB2), Color(0xFFEF476F), Color(0xFFFFD166), Color(0xFF06A77D),
+        Color(0xFFFF8C42), Color(0xFF8ECAE6), Color(0xFF219EBC), Color(0xFFFFC8DD), Color(0xFFFFAFCC),
+        Color(0xFFCDB4DB), Color(0xFFFFE066), Color(0xFF9BF6FF), Color(0xFFCAFFBF), Color(0xFFFFADAD)
+    )
+
+    fun getCategoryColor(category: String): Color {
+        return categoryColors.getOrPut(category) {
+            colors[categoryColors.size % colors.size]
+        }
+    }
 
     init {
         viewModelScope.launch {
