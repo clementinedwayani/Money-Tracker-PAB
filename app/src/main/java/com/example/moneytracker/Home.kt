@@ -99,6 +99,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .background(Color(0xFFFBFAF5)),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
