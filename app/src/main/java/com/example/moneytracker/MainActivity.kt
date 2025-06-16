@@ -35,8 +35,7 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             Home(
                                 navController = navController,
-                                name = "User",
-                                viewModel = mainViewModel
+                                name = "User"
                             )
                         }
                         composable("charts") { Chart(navController = navController) }

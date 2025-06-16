@@ -33,6 +33,13 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
         }
     }
 
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            dao.deleteTransaction(transaction)
+            loadTransactions()  // Refresh data setelah delete
+        }
+    }
+
     fun getSavingSummary(): List<SavingSummary> {
         val savings = transactions.filter { it.type == "Saving" }
         return savings.groupBy { it.category }.map { (category, list) ->

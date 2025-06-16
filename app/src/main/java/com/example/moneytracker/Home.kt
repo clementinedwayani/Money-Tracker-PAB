@@ -216,7 +216,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                         )
                     }
                     items(dailyTransactions) { transaction ->
-                        TransactionItem(transaction)
+                        TransactionItem(transaction, viewModel)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
@@ -256,7 +256,9 @@ private operator fun Calendar.compareTo(date: Date): Int {
 }
 
 @Composable
-fun TransactionItem(transaction: Transaction) {
+fun TransactionItem(transaction: Transaction, viewModel: MainViewModel) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     val splitCategory = transaction.category.split(" ", limit = 2)
     val emoji = splitCategory.getOrNull(0) ?: "❓"
     val categoryName = splitCategory.getOrNull(1) ?: transaction.category
@@ -268,7 +270,8 @@ fun TransactionItem(transaction: Transaction) {
             .clip(RoundedCornerShape(10.dp))
             .background(Color(0xFFF5FFF6))
             .height(80.dp)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable { showDeleteDialog = true },
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -288,6 +291,27 @@ fun TransactionItem(transaction: Transaction) {
                 fontWeight = FontWeight.Bold
             )
         }
+    }
+
+    if (showDeleteDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Transaction?") },
+            text = { Text("Are you sure you want to delete this transaction?") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    viewModel.deleteTransaction(transaction)
+                    showDeleteDialog = false
+                }) {
+                    Text("Delete", color = Color.Red)
+                }
+            },
+            dismissButton =  {
+                androidx.compose.material3.TextButton(onClick = { showDeleteDialog = false}) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 
@@ -356,64 +380,6 @@ fun ButtonNav(navController: NavController) {
             }
         }
     }
-    @Composable
-    fun TransactionItem(transaction: Transaction) {
-        val dateFormat = SimpleDateFormat("EEE, dd/MM", Locale.getDefault())
-        val transactionDate = dateFormat.format(Date(transaction.date))
-        val splitCategory = transaction.category.split(" ", limit = 2)
-        val emoji = splitCategory.getOrNull(0) ?: "❓"
-        val categoryName = splitCategory.getOrNull(1) ?: transaction.category
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .offset(y = (-10).dp)
-                    .clip(RoundedCornerShape(bottomEnd = 10.dp))
-                    .background(Color(0xFF9CE5B2))
-                    .padding(horizontal = 16.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = transactionDate,
-                    color = Color.Black,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .shadow(elevation = 5.dp, shape = RoundedCornerShape(10.dp))
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFF5FFF6))
-                    .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(horizontal = 16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = emoji,
-                            fontSize = 24.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = categoryName, fontSize = 18.sp)
-                    }
-                    Text(
-                        text = if (transaction.type == "Income") "+Rp ${transaction.amount.toInt()}" else "-Rp ${transaction.amount.toInt()}",
-                        color = if (transaction.type == "Income") Color.Green else Color.Red,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
 }
+
+
