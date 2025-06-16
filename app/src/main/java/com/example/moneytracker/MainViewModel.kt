@@ -49,6 +49,15 @@ class MainViewModel (application: Application): AndroidViewModel(application) {
             SavingSummary(category, total, goal, remaining)
         }
     }
+
+    fun deleteSavingCategory(category: String) {
+        viewModelScope.launch {
+            val savingsToDelete = transactions.filter { it.type == "Saving" && it.category == category }
+            savingsToDelete.forEach { dao.deleteTransaction(it) }
+            loadTransactions()  // Refresh data
+        }
+    }
+
 }
 
 //class MainViewModel : ViewModel() {

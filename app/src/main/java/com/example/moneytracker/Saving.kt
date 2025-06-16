@@ -17,6 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,6 +88,7 @@ fun Saving(navController: NavController, viewModel: MainViewModel = viewModel())
 @Composable
 fun SavingBox(viewModel: MainViewModel) {
     val summaries = viewModel.getSavingSummary()
+    var categoryToDelete by remember { mutableStateOf<String?>(null) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         summaries.forEach { summary ->
@@ -99,6 +104,7 @@ fun SavingBox(viewModel: MainViewModel) {
                     .width(350.dp)
                     .height(100.dp)
                     .padding(16.dp)
+                    .clickable { categoryToDelete = summary.category }
             ) {
                 Row(
                     modifier = Modifier.fillMaxSize(),
@@ -127,7 +133,28 @@ fun SavingBox(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.height(16.dp))
         }
         if (summaries.isEmpty()) {
-            Text("Belum ada data tabungan.", color = Color.Gray)
+            Text("No savings yet.", color = Color.Gray)
+        }
+
+        categoryToDelete?.let { category ->
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { categoryToDelete = null },
+                title = { Text("Delete Savings?") },
+                text = { Text("Are you sure you want to delete this savings \"$category\"?") },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(onClick = {
+                        viewModel.deleteSavingCategory(category)
+                        categoryToDelete = null
+                    }) {
+                        Text("Delete", color = Color.Red)
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(onClick = { categoryToDelete = null }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }
