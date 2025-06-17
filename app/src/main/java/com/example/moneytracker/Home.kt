@@ -205,6 +205,7 @@ fun Home(navController: NavController, name: String, modifier: Modifier = Modifi
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .padding(bottom = 72.dp)
             ) {
                 groupedTransactions.forEach { (date, dailyTransactions) ->
                     item {
