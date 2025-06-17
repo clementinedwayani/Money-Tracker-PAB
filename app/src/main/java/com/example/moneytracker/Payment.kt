@@ -29,6 +29,9 @@ import java.util.*
 
 @Composable
 fun Payment(navController: NavController, viewModel: MainViewModel = viewModel()) {
+    LaunchedEffect(Unit) {
+        viewModel.loadPayments()
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
