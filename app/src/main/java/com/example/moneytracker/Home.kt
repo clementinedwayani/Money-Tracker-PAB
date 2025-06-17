@@ -20,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.NavController
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -319,13 +321,17 @@ fun TransactionItem(transaction: Transaction, viewModel: MainViewModel) {
 
 @Composable
 fun ButtonNav(navController: NavController) {
-    val items = listOf("Home", "Charts", "Saving", "Payment")
+    val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+
+    val items = listOf("home", "charts", "saving", "payment")
+    val labels = listOf("Home", "Charts", "Saving", "Payment")
     val icons = listOf(
         R.drawable.home,
         R.drawable.chart,
         R.drawable.saving,
         R.drawable.payment
     )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -334,54 +340,44 @@ fun ButtonNav(navController: NavController) {
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items.forEachIndexed { index, label ->
+        items.forEachIndexed { index, route ->
+            val isSelected = currentDestination == route
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
                 modifier = Modifier
+                    .clip(CircleShape) // untuk hapus kotak
                     .clickable {
-                        when (label) {
-                            "Home" -> navController.navigate("home") {
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                            "Charts" -> navController.navigate("charts") {
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                            "Saving" -> navController.navigate("saving") {
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
-                            "Payment" -> navController.navigate("payment") {
-                                popUpTo(navController.graph.startDestinationId)
-                                launchSingleTop = true
-                            }
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId)
+                            launchSingleTop = true
                         }
                     }
+                    .padding(4.dp) // untuk memberi jarak klik
             ) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFF5FFF6)),
+                        .background(if (isSelected) Color.White else Color(0xFFF5FFF6)),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = icons[index]),
-                        contentDescription = label,
-                        modifier = Modifier.size(30.dp)
+                        contentDescription = labels[index],
+                        modifier = Modifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(
+                            if (isSelected) Color(0xFF639F86) else Color.Black
+                        )
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = label,
-                    color = Color.Black,
-                    fontSize = 14.sp
+                    text = labels[index],
+                    color = if (isSelected) Color.White else Color.Black,
+                    fontSize = 12.sp
                 )
             }
         }
     }
 }
-
-
