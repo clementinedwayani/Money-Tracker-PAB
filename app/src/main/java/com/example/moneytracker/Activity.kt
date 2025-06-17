@@ -230,9 +230,20 @@ fun Activity(navController: NavController, viewModel: MainViewModel = viewModel(
 
             Toast.makeText(context, "Transaction saved!", Toast.LENGTH_SHORT).show()
 
-            // Navigate to home after saving
-            navController.navigate("home") {
-                popUpTo("home") { inclusive = true }
+            // Navigate based on selected tab
+            when (selectedTab) {
+                0, 1 -> {
+                    // For Expense and Income, navigate to home
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+                2 -> {
+                    // For Saving, navigate to saving page
+                    navController.navigate("saving") {
+                        popUpTo("saving") { inclusive = true }
+                    }
+                }
             }
 
         } catch (e: Exception) {

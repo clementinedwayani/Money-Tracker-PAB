@@ -35,7 +35,7 @@ import java.util.Calendar
 @Composable
 fun Home(navController: NavController, name: String, modifier: Modifier = Modifier, viewModel: MainViewModel = viewModel()) {
     // Menyimpan transaksi pada halaman Home
-    val transactions = viewModel.transactions ?: emptyList()
+    val transactions = viewModel.transactions?.filter { it.type == "Income" || it.type == "Expense" } ?: emptyList()
     Log.d("Home", "Transactions in Home: ${transactions.size}")
     Log.d("HomeVM", "Hash: ${viewModel.hashCode()}, Size: ${viewModel.transactions.size}")
 
